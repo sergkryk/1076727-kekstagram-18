@@ -4,7 +4,6 @@ var picture = document.querySelector('#picture').content.querySelector('.picture
 var picturesSection = document.querySelector('.pictures');
 var bigPicture = document.querySelector('.big-picture');
 var commentItem = document.querySelector('.social__comment');
-var commentsList = document.querySelector('.social__comments');
 
 // получаю случайное число
 var randomNumber = function (min, max) {
