@@ -1,18 +1,31 @@
 'use strict';
+var PIN_PERCENT = 4.5;
+var EFFECT_DEFAULT = 20;
+var ESC_KEYCODE = 27;
 var arrayLength = 25;
 var picture = document.querySelector('#picture').content.querySelector('.picture');
 var picturesSection = document.querySelector('.pictures');
 var bigPicture = document.querySelector('.big-picture');
 var commentItem = document.querySelector('.social__comment');
+var uploadFileInput = document.querySelector('#upload-file');
+var effectLevelPin = document.querySelector('.effect-level__pin');
+var effectLevelLine = document.querySelector('.effect-level__line');
+var effectsRadio = document.querySelectorAll('.effects__radio');
+var effectLevelInput = document.querySelector('.effect-level__value')
 
-// получаю случайное число
+// получить случайное число
 var randomNumber = function (min, max) {
   return Math.floor(min + Math.random() * (max + 1 - min));
 };
 
-// скрываю элемент
+// скрыть элемент
 var hideElement = function (element) {
   element.classList.add('hidden');
+};
+
+// показать элемент
+var showElement = function (element) {
+  element.classList.remove('hidden');
 };
 
 var MOCK = {
@@ -33,7 +46,7 @@ var MOCK = {
   name: ['Феликс', 'Сегизмунд', 'Герман', 'Анжелика', 'Дея Торис', 'Фиона', 'Йеннифер', 'Трисс', 'Геральт', 'Фродо']
 };
 
-// генерирую массив данных на основании моковых данных
+// генерировать массив данных на основании моковых данных
 var generatePictureArray = function (mock) {
   var arr = [];
   for (var i = 0; i < arrayLength; i++) {
@@ -49,23 +62,28 @@ var generatePictureArray = function (mock) {
   return arr;
 };
 
-// генерирую превью на страницу
+// генерировать превью на страницу
 var generatePicturePreview = function (data) {
   var element = picture.cloneNode(true);
   element.querySelector('.picture__img').src = data.url;
   element.querySelector('.picture__likes').textContent = data.likes;
   element.querySelector('.picture__comments').textContent = data.comments;
+  element.tabindex = 0;
+  element.addEventListener('click', function () {
+    renderBigPicture(bigPicture, data);
+    element.blur();
+  });
   return element;
 };
 
-// размещаю превью на странице
+// разместить превью на странице
 var renderPreviews = function (data) {
   data.forEach(function (it) {
     picturesSection.appendChild(generatePicturePreview(it));
   });
 };
 
-// заполняю данными карточку превью
+// заполнить данными карточку превью
 var renderBigPicture = function (element, array) {
   element.querySelector('.big-picture__img').querySelector('img').src = array.url;
   element.querySelector('.likes-count').textContent = array.likes;
@@ -78,14 +96,38 @@ var renderBigPicture = function (element, array) {
   }
   element.querySelector('.social__caption').textContent = array.description;
   element.classList.remove('hidden');
+  element.querySelector('.big-picture__cancel').addEventListener('click', function () {
+    element.classList.add('hidden');
+  });
+  document.addEventListener('keydown', escButtonPressHandler);
 };
 
-// генерирую блок комментариев к карточке
+// скрыть элемент по нажатию esc
+var escButtonPressHandler = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    document.querySelector('.big-picture').classList.add('hidden');
+    document.removeEventListener('keydown', escButtonPressHandler);
+  }
+};
+
+// генерировать блок комментариев к карточке
 var generateComments = function (array) {
   var element = commentItem.cloneNode(true);
   element.querySelector('.social__picture').src = array.avatar;
   element.querySelector('.social__text').textContent = array.comments[randomNumber(0, array.comments.length - 1)];
   return (element);
+};
+
+// module4-task2
+
+// получение координат элемента
+function getCoords(elem) {
+  return elem.getBoundingClientRect().left;
+}
+
+// получение значения ползунка эффектов
+var getEffectLevelValue = function () {
+  return Math.round((getCoords(effectLevelPin) - getCoords(effectLevelLine)) / PIN_PERCENT) + 2;
 };
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> ход выполнения <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -94,8 +136,24 @@ var pictures = generatePictureArray(MOCK);
 
 renderPreviews(pictures);
 
-renderBigPicture(bigPicture, pictures[6]);
+// renderBigPicture(bigPicture, pictures[6]);
 
 hideElement(document.querySelector('.social__comment-count'));
 
 hideElement(document.querySelector('.comments-loader'));
+
+// showElement(document.querySelector('.img-upload__overlay'));
+
+uploadFileInput.addEventListener('change', function () {
+  showElement(document.querySelector('.img-upload__overlay'));
+});
+
+effectLevelPin.addEventListener('mouseup', function () {
+  effectLevelInput.value = getEffectLevelValue();
+});
+
+effectsRadio.forEach(function (it) {
+  it.addEventListener('change', function () {
+    effectLevelInput.value = EFFECT_DEFAULT;
+  });
+});
