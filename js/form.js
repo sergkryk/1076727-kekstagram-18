@@ -1,7 +1,8 @@
 'use strict';
 (function () {
   var TAG_NUMBER = 5;
-  var DEBOUNCE_INTERVAL = 1000;
+  var DEBOUNCE_INTERVAL = 500;
+  var MAX_TAG_LENGTH = 20;
   var uploadFileInput = document.querySelector('#upload-file');
   var uploader = document.querySelector('.img-upload__overlay');
   var uploaderCloseButton = uploader.querySelector('.img-upload__cancel');
@@ -20,8 +21,10 @@
   };
 
   var onClickCheckHashtags = window.debounce(DEBOUNCE_INTERVAL, function () {
-    var re = new RegExp('(?:\s|^)#[A-Za-z0-9\-\.\_]+(?:\s|$)');
-    var tagList = hashtags.value.split(' ');
+    var re = new RegExp('(^#[a-z\d][\w-]*)');
+    var tagList = hashtags.value.split(' ').filter(function (el) {
+      return el.length > 0;
+    });
     hashtags.setCustomValidity('');
     if (tagList.length > TAG_NUMBER) {
       hashtags.setCustomValidity('Воу воу, полегче, не боле 5ти тегов на фото');
@@ -32,6 +35,8 @@
     tagList.forEach(function (it) {
       if (!re.test(it)) {
         hashtags.setCustomValidity('Воу воу, полегче! Пиши хештег правильно! Начни с решетки, затем символы, буквы или цифры, не более 20ти!');
+      } else if (it.length > MAX_TAG_LENGTH) {
+        hashtags.setCustomValidity('Воу воу, полегче! Хештег не должен быть длинне 20 символов');
       }
     });
   });
