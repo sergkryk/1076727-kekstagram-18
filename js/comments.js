@@ -18,6 +18,7 @@
   var generateComments = function (array) {
     var element = comment.cloneNode(true);
     element.querySelector('.social__picture').src = array.avatar;
+    element.querySelector('.social__picture').alt = array.name;
     element.querySelector('.social__text').textContent = array.message;
     return (element);
   };

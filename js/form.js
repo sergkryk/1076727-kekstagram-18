@@ -1,5 +1,7 @@
 'use strict';
 (function () {
+  var TAG_NUMBER = 5;
+  var DEBOUNCE_INTERVAL = 1000;
   var uploadFileInput = document.querySelector('#upload-file');
   var uploader = document.querySelector('.img-upload__overlay');
   var uploaderCloseButton = uploader.querySelector('.img-upload__cancel');
@@ -7,20 +9,31 @@
   var hashtags = document.querySelector('.text__hashtags');
   var description = document.querySelector('.text__description');
 
-  description.addEventListener('focus', function () {
-    document.removeEventListener('keydown', onEscUploaderHide);
-  });
+  var checkDuplicates = function (array) {
+    var result = [];
+    array.forEach(function (it) {
+      if (!result.includes(it.toLowerCase())) {
+        result.push(it);
+      }
+    });
+    return result.length < array.length;
+  };
 
-  description.addEventListener('blur', function () {
-    document.addEventListener('keydown', onEscUploaderHide);
-  });
-
-  hashtags.addEventListener('focus', function () {
-    document.removeEventListener('keydown', onEscUploaderHide);
-  });
-
-  hashtags.addEventListener('blur', function () {
-    document.addEventListener('keydown', onEscUploaderHide);
+  var onClickCheckHashtags = window.debounce(DEBOUNCE_INTERVAL, function () {
+    var re = new RegExp('(?:\s|^)#[A-Za-z0-9\-\.\_]+(?:\s|$)');
+    var tagList = hashtags.value.split(' ');
+    hashtags.setCustomValidity('');
+    if (tagList.length > TAG_NUMBER) {
+      hashtags.setCustomValidity('Воу воу, полегче, не боле 5ти тегов на фото');
+    }
+    if (checkDuplicates(tagList)) {
+      hashtags.setCustomValidity('Воу воу, полегче, не нужно одинаковых хештегов!');
+    }
+    tagList.forEach(function (it) {
+      if (!re.test(it)) {
+        hashtags.setCustomValidity('Воу воу, полегче! Пиши хештег правильно! Начни с решетки, затем символы, буквы или цифры, не более 20ти!');
+      }
+    });
   });
 
   var resetUploadForm = function () {
@@ -45,6 +58,24 @@
       hideUploadForm();
     }
   };
+
+  hashtags.addEventListener('input', onClickCheckHashtags);
+
+  description.addEventListener('focus', function () {
+    document.removeEventListener('keydown', onEscUploaderHide);
+  });
+
+  description.addEventListener('blur', function () {
+    document.addEventListener('keydown', onEscUploaderHide);
+  });
+
+  hashtags.addEventListener('focus', function () {
+    document.removeEventListener('keydown', onEscUploaderHide);
+  });
+
+  hashtags.addEventListener('blur', function () {
+    document.addEventListener('keydown', onEscUploaderHide);
+  });
 
   uploadFileInput.addEventListener('change', function () {
     window.utils.showElement(uploader);

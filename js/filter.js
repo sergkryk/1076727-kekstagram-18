@@ -1,18 +1,17 @@
 'use strict';
 (function () {
   var FILTERED_COUNT = 10;
-  var popularButton = document.querySelector('#filter-popular');
-  var randomButton = document.querySelector('#filter-random');
-  var discussedButton = document.querySelector('#filter-discussed');
+  var INTERVAL = 500;
   var filterButtons = document.querySelectorAll('.img-filters__button');
+  var filtersForm = document.querySelector('.img-filters__form');
 
-  var toggleActive = function (button) {
+  var toggleActive = function (element) {
     filterButtons.forEach(function (it) {
       if (it.classList.contains('img-filters__button--active')) {
         it.classList.remove('img-filters__button--active');
       }
     });
-    button.classList.add('img-filters__button--active');
+    document.querySelector('#' + element).classList.add('img-filters__button--active');
   };
 
   var shuffle = function (a) {
@@ -28,28 +27,24 @@
     return a;
   };
 
-  var onClickByPopularitySort = window.debounce(function () {
+  var onClickSort = window.debounce(INTERVAL, function (evt) {
     window.photo.removePhotoPreviews();
-    toggleActive(popularButton);
-    window.photo.renderPhotoPreviews(window.data);
+    toggleActive(evt.target.id);
+    switch (evt.target.id) {
+      case 'filter-popular':
+        window.photo.renderPhotoPreviews(window.data);
+        break;
+      case 'filter-discussed':
+        window.photo.renderPhotoPreviews(window.data.slice().sort(function (b, a) {
+          return a.comments.length - b.comments.length;
+        }));
+        break;
+      case 'filter-random':
+        window.photo.renderPhotoPreviews(shuffle(window.data.slice()).slice(0, FILTERED_COUNT));
+        break;
+    }
   });
 
-  var onClickByCommentsSort = window.debounce(function () {
-    window.photo.removePhotoPreviews();
-    toggleActive(discussedButton);
-    window.photo.renderPhotoPreviews(window.data.slice().sort(function (b, a) {
-      return a.comments.length - b.comments.length;
-    }).slice(0, FILTERED_COUNT));
-  });
-
-  var onClickRandomlySort = window.debounce(function () {
-    window.photo.removePhotoPreviews();
-    toggleActive(randomButton);
-    window.photo.renderPhotoPreviews(shuffle(window.data).slice(0, FILTERED_COUNT));
-  });
-
-  popularButton.addEventListener('click', onClickByPopularitySort);
-  discussedButton.addEventListener('click', onClickByCommentsSort);
-  randomButton.addEventListener('click', onClickRandomlySort);
+  filtersForm.addEventListener('click', onClickSort);
 
 })();

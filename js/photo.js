@@ -5,6 +5,7 @@
   var photoSection = document.querySelector('.big-picture');
   var photoSectionCloseBtn = photoSection.querySelector('.big-picture__cancel');
   var filter = document.querySelector('.img-filters');
+  var fragment = document.createDocumentFragment();
 
   var showFilters = function () {
     filter.classList.remove('img-filters--inactive');
@@ -25,8 +26,9 @@
 
   var renderPhotoPreviews = function (data) {
     data.forEach(function (it) {
-      photosContainer.appendChild(createPhotoPreview(it));
+      fragment.appendChild(createPhotoPreview(it));
     });
+    photosContainer.appendChild(fragment);
   };
 
   var removePhotoPreviews = function () {

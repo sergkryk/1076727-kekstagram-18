@@ -1,11 +1,6 @@
 'use strict';
 (function () {
   var ESC_KEYCODE = 27;
-  // получить случайное число
-  var getRandomNumber = function (min, max) {
-    return Math.floor(min + Math.random() * (max + 1 - min));
-  };
-
   // скрыть элемент
   var hideElement = function (element) {
     element.classList.add('hidden');
@@ -21,10 +16,10 @@
   };
 
   window.utils = {
-    getRandomNumber: getRandomNumber,
     hideElement: hideElement,
     showElement: showElement,
     ESC_KEYCODE: ESC_KEYCODE,
     round: round
   };
+
 })();
